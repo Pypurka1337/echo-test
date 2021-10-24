@@ -1,64 +1,52 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Echo-test
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Немного о проекте:
 
-## About Laravel
+Проект представляет собой небольшой api по тестовому заданию компании Echo
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Развертка проекта
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Клонировать репозиторий
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```git clone https://github.com/Pypurka1337/echo-test.git ```
 
-## Learning Laravel
+### 2. Создать фаил .env на основе файла .env.example
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. Запускаем докер
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```docker-compose up -d```
 
-## Laravel Sponsors
+### 4. Загрузить пакеты composer
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```docker-compose run --rm --no-deps php-fpm composer install```
 
-### Premium Partners
+### 5. Даем доступ к категории storage
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
+```docker-compose run --rm --no-deps webserver chmod -R 777 storage/```
 
-## Contributing
+### 6. Генерируем ключи шифрования
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```docker-compose run --rm --no-deps php-fpm php artisan key:generate```
 
-## Code of Conduct
+### 7. Сбрасываем конфигурацию
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```docker-compose run --rm --no-deps php-fpm php artisan config:cache```
 
-## Security Vulnerabilities
+### 8. Включаем миграции
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```docker-compose run --rm --no-deps php-fpm php artisan migrate```
 
-## License
+### 9. Заполняем БД данными
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```docker-compose run --rm --no-deps php-fpm php artisan db:seed  ```
+
+### ГОТОВО!
+
+## Теперь можно получить доступ к документации по адресу [http://localhost/api/documentation](http://localhost/api/documentation)
+
+    Путь к документации: "http://localhost/docs/api.yaml"
+
+## Выявленные Недостатки\Недоработки
+
+- В связи с первым опытом с OpenApi 3.0 не мог реализовать полное описание API, а именно переменные query запроса. Там
+  просто неассоциативный массив в неассоциативном массиве, и я не смог разобраться как это реализовать.

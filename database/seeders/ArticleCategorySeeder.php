@@ -10,8 +10,6 @@ use Illuminate\Database\Seeder;
 class ArticleCategorySeeder extends Seeder
 {
 
-//    Выполняется около 15 минут, не знаю как сделать это более оптимально
-
     /**
      * Run the database seeds.
      *

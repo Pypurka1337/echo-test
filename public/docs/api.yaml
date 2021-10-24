@@ -1,0 +1,747 @@
+openapi: 3.0.3
+info:
+  title: Echo-test API
+  description: Echo-test API
+  version: 1.0.0
+servers:
+  - url: http://localhost
+paths:
+  /api/articles:
+    get:
+      parameters:
+        - in: query
+          name: fields[]
+          description: Массив полей которые будут выведенны
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: filters[]    #http://localhost/api/articles?filters[0][0]=id&filters[0][1]=10 -- ссылка должна формироваться такого вида, но у меня не получилось
+          description: Массив фильтров поиска
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+          style: form
+#          style: deepObject
+        - in: query
+          name: sort[]
+          description: Массив полей сорртировки где 'поле' - asc. A '-поле' - desc.
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: author[]
+          description: Массив фильтров поиска по таблице авторов
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+          style: form
+          #          style: deepObject
+        - in: query
+          name: categories[]
+          description: Массив фильтров поиска по таблице категории
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+          style: form
+            #          style: deepObject
+      tags:
+        - Articles
+      summary: Возвращает список Статей
+      description: Возвращает список Статей
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: "#/components/schemas/ArticleResponse"
+
+    post:
+      tags:
+        - Articles
+      summary: Создает новую Статью
+      description: Создает новую Статью
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: "#/components/schemas/ArticleRequestPost"
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ArticleResponseDetail"
+  /api/articles/{article}:
+    parameters:
+      - in: path
+        name: article
+        example: slug
+        required: true
+    get:
+      tags:
+        - Articles
+      summary: Выдает одну Статью
+      description: Выдает одну Статью
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ArticleResponseDetail"
+    patch:
+      tags:
+        - Articles
+      summary: "Обновляет поля Статьи"
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: "#/components/schemas/ArticleRequestPatch"
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: "#/components/schemas/ArticleResponseDetail"
+    delete:
+      tags:
+        - Articles
+      summary: Удаляет Статью
+      description: Удаляет Статью
+      responses:
+        '204':
+          description: Статья успешно удалена
+
+  /api/authors:
+    get:
+      parameters:
+        - in: query
+          name: fields[]
+          description: Массив полей которые будут выведенны
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: filters[]    #http://localhost/api/authors?filters[0][0]=id&filters[0][1]=10 -- ссылка должна формироваться такого вида, но у меня не получилось
+          description: Массив фильтров поиска
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+          style: form
+        #          style: deepObject
+        - in: query
+          name: sort[]
+          description: Массив полей сорртировки где 'поле' - asc. A '-поле' - desc.
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: articles[]
+          description: Массив фильтров поиска по таблице Статьи
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+          style: form
+          #          style: deepObject
+      tags:
+        - Authors
+      summary: Выдает список Авторов
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuthorResponse'
+    post:
+      tags:
+        - Authors
+      summary: "Создает нового Автора"
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: '#/components/schemas/AuthorRequestPost'
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AuthorResponse'
+  /api/authors/{author}:
+    parameters:
+      - in: path
+        name: author
+        example: slug
+        required: true
+      - in: query
+        name: articles-data
+        example: true
+        schema:
+          type: boolean
+    get:
+      tags:
+        - Authors
+      summary: Выдает одного Автора
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                     $ref: '#/components/schemas/AuthorResponse'
+    patch:
+      tags:
+        - Authors
+      summary: "Обновляет поля Автора"
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: '#/components/schemas/AuthorRequest'
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AuthorResponse'
+    delete:
+      tags:
+        - Authors
+      summary: Удаляет Автора
+      description: Удаляет Автора
+      responses:
+        '204':
+          description: Автор успешно удален
+
+  /api/categories:
+    get:
+      tags:
+        - Categories
+      summary: "Выдает список Категорий"
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+    post:
+      tags:
+        - Categories
+      summary: "Создает новую Категорию"
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: '#/components/schemas/CategoryRequestPost'
+      responses:
+        '201':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+
+  /api/categories/{category}:
+    parameters:
+      - in: path
+        name: category
+        example: slug
+        required: true
+    get:
+      tags:
+        - Categories
+      summary: Выдает одну Категорию
+      description: Выдает одну Категорию
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: '#/components/schemas/CategoryResponseDetail'
+    patch:
+      tags:
+        - Categories
+      summary: Обновляет поля Категории
+      requestBody:
+        content:
+          'aplication/json':
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+      responses:
+        '200':
+          description: Успех
+          content:
+            'aplication/json':
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+    delete:
+      tags:
+        - Categories
+      summary: Удаляет Категорию
+      description: Удаляет Категорию
+      responses:
+        '204':
+          description: Категория успешно удален
+
+components:
+  schemas:
+    ArticleResponse:
+      properties:
+        current_page:
+          description: Номер текущей страницы
+          type: integer
+          example: 1
+        data:
+          description: Масив статей
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryResponseDetail"
+        first_page_url:
+          description: Ссылка на первую страницу
+          type: string
+          example: http://localhost/api/articles?page=1
+        from:
+          description: Номер статьи с которой начинается страница
+          type: integer
+          example: 1
+        last_page:
+          description: Номер последней страницы
+          type: integer
+          example: 1001
+        last_page_url:
+          description: Ссылка на последнюю страницу
+          type: string
+          example: http://localhost/api/articles?page=1001
+        links:
+          description: Массив ссылок пагинации
+          type: array
+          example: []
+        next_page_url:
+          description: Ссылка на следующую страницу
+          type: string
+          example: http://localhost/api/articles?page=2
+        path:
+          description: Путь текущей страницы
+          type: string
+          example: http://localhost/api/articles
+        per_page:
+          description: Количество статей на странице
+          type: integer
+          example: 10
+        prev_page_url:
+          description: Ссылка на предыдущую страницу
+          type: string
+          example: null
+        to:
+          description: Номер статьи которой кончается страница
+          type: integer
+          example: 10
+        total:
+          description: Всего статей
+          type: integer
+          example: 10008
+    ArticleRequestPost:
+      properties:
+        name:
+          type: string
+          example: Название статьи
+        image:
+          type: string
+          example: /images/image-1.jpg
+        preview_text:
+          type: string
+          example: Превью текст статьи
+        detail_text:
+          type: string
+          example: Детальный текст статьи
+        author_id:
+          type: integer
+          example: 1
+        category_ids:
+          type: array
+          example: [ 1,2,3 ]
+    ArticleResponseDetail:
+      type: object
+      properties:
+        id:
+          description: id
+          type: integer
+          example: 1
+        name:
+          description: Название
+          type: string
+          example: Название статьи
+        image:
+          description: Ссылка на изображение
+          type: string
+          example: /images/image-1.jpg
+        preview_text:
+          description: Превью текст
+          type: string
+          example: Превью текст
+        detail_text:
+          description: Детальный текст
+          type: string
+          example: Детальный текст
+        author_id:
+          description: id Автора
+          type: integer
+          example: 1
+        slug:
+          description: slug поле. Формируется из name
+          type: string
+          example: nazvanie-stati
+        updated_at:
+          description: Дата последнего изменения. Создается автоматически
+          type: string
+          example: 1
+        created_at:
+          description: Дата создания. Создается автоматически
+          type: string
+          example: 1
+        author:
+          $ref: "#/components/schemas/AuthorResponse"
+        categories:
+          $ref: "#/components/schemas/CategoryResponseDetail"
+    ArticleRequest:
+      required:
+        - name
+        - image
+        - preview_text
+        - detail_text
+        - author_id
+        - category_ids
+      properties:
+        name:
+          type: string
+          example: Название статьи
+        image:
+          type: string
+          example: /images/image-1.jpg
+        preview_text:
+          type: string
+          example: Превью текст статьи
+        detail_text:
+          type: string
+          example: Детальный текст статьи
+        author_id:
+          type: integer
+          example: 1
+        slug:
+          type: string
+          example: nazvanie-stati
+        category_ids:
+          type: array
+          example: [ 1,2,3 ]
+    ArticleRequestPatch:
+      properties:
+        name:
+          type: string
+          example: Название статьи
+        image:
+          type: string
+          example: /images/image-1.jpg
+        preview_text:
+          type: string
+          example: Превью текст статьи
+        detail_text:
+          type: string
+          example: Детальный текст статьи
+        author_id:
+          type: integer
+          example: 1
+        category_ids:
+          type: array
+          example: [ 1,2,3 ]
+
+
+    AuthorResponse:
+      type: object
+      properties:
+        id:
+          description: id автора статьи
+          type: integer
+          example: 1
+        first_name:
+          description: Имя
+          type: string
+          example: Имя
+        middle_name:
+          description: Отчество
+          type: string
+          example: Отчество
+        last_name:
+          description: Фамилия
+          type: string
+          example: Фамилия
+        avatar:
+          description: Аватар автора
+          type: string
+          example: /images/image-1.jpg
+        birth_year:
+          description: Год рождения автора
+          type: string
+          example: 1994
+        biography:
+          description: Биография автора
+          type: string
+          example: Биография автора
+        slug:
+          description: Slug - генерация по ИОФ
+          type: string
+          example: imya-otcestvo-familia
+        created_at:
+          description: Дата создания. Создается автоматически
+          type: string
+          example: 2021-10-23T17:33:09.000000Z
+        updated_at:
+          description: Дата именения. Создается автоматически
+          type: string
+          example: 2021-10-23T17:33:09.000000Z
+    AuthorRequest:
+      type: object
+      properties:
+        first_name:
+          description: Имя
+          type: string
+          example: Имя
+        middle_name:
+          description: Отчество
+          type: string
+          example: Отчество
+        last_name:
+          description: Фамилия
+          type: string
+          example: Фамилия
+        avatar:
+          description: Аватар автора
+          type: string
+          example: /images/image-1.jpg
+        birth_year:
+          description: Год рождения автора
+          type: string
+          example: 1994
+        biography:
+          description: Биография автора
+          type: string
+          example: Биография автора
+    AuthorRequestPost:
+      type: object
+      required:
+        - first_name
+        - middle_name
+        - last_name
+        - avatar
+        - birth_year
+        - biography
+      properties:
+        first_name:
+          description: Имя
+          type: string
+          example: Имя
+        middle_name:
+          description: Отчество
+          type: string
+          example: Отчество
+        last_name:
+          description: Фамилия
+          type: string
+          example: Фамилия
+        avatar:
+          description: Аватар автора
+          type: string
+          example: /images/image-1.jpg
+        birth_year:
+          description: Год рождения автора
+          type: string
+          example: 1994
+        biography:
+          description: Биография автора
+          type: string
+          example: Биография автора
+
+
+    CategoryResponse:
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              description: Название
+              type: string
+              example: Имя
+            image:
+              description: Изображение
+              type: string
+              example: /images/image-1.jpg
+            slug:
+              description: slug из Названия
+              type: string
+              example: imya
+            _lft:
+              description: Левый ключь nested sets дерева
+              type: integer
+              example: 1
+            _rgt:
+              description: Правый ключь nested sets дерева
+              type: integer
+              example: 18
+            parent_id:
+              description: Ключ радительской категории
+              type: integer
+              example: 1
+            created_at:
+              description: Дата создания
+              type: string
+              example: 2021-10-24T15:11:59.000000Z
+            updated_at:
+              description: Дата создания
+              type: string
+              example: 2021-10-24T15:11:59.000000Z
+            clidren:
+              description: Массив категорий-детей данной категории
+              type: array
+              example: [ ]
+    CategoryResponseDetail:
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              description: Название
+              type: string
+              example: Имя
+            image:
+              description: Изображение
+              type: string
+              example: /images/image-1.jpg
+            slug:
+              description: slug из Названия
+              type: string
+              example: imya
+            depth:
+              description: Глубина категории
+              type: string
+              example: imya
+            _lft:
+              description: Левый ключь nested sets дерева
+              type: integer
+              example: 1
+            _rgt:
+              description: Правый ключь nested sets дерева
+              type: integer
+              example: 18
+            parent_id:
+              description: Ключ радительской категории
+              type: integer
+              example: 1
+            created_at:
+              description: Дата создания
+              type: string
+              example: 2021-10-24T15:11:59.000000Z
+            updated_at:
+              description: Дата создания
+              type: string
+              example: 2021-10-24T15:11:59.000000Z
+            siblings:
+              description: Массив братьев и сестр данной категории
+              type: array
+              example: [ ]
+            ancestors:
+              description: Массив предков данной категории
+              type: array
+              example: [ ]
+            descendants:
+              description: Массив потомков данной категории
+              type: array
+              example: [ ]
+    CategoryRequest:
+      properties:
+        name:
+          description: Название
+          type: string
+          example: Имя
+        image:
+          description: Изображение
+          type: string
+          example: /images/image-1.jpg
+        description:
+          description: Описание
+          type: string
+          example: Описание
+        parent_id:
+          description: Ключ радительской категории
+          type: integer
+          example: 1
+    CategoryRequestPost:
+      required:
+        - name
+        - image
+        - description
+        - parent_id
+      properties:
+        name:
+          description: Название
+          type: string
+          example: Имя
+        image:
+          description: Изображение
+          type: string
+          example: /images/image-1.jpg
+        description:
+          description: Описание
+          type: string
+          example: Описание
+        parent_id:
+          description: Ключ радительской категории
+          type: integer
+          example: 1

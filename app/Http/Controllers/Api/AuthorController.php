@@ -61,7 +61,7 @@ class AuthorController extends Controller
         $size = $request->query('size', 10);
         $result = $authors->paginate($size)->withQueryString();
         foreach ($result->items() as $author) {
-            $author->detail_page_url = $request->url() . '/' . $author->id;
+            $author->detail_page_url = $request->url() . '/' . $author->slug;
         }
 
         return response()->json($result);
@@ -91,7 +91,7 @@ class AuthorController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate(
             [
@@ -120,7 +120,7 @@ class AuthorController extends Controller
      * @param Author $author
      * @return JsonResponse
      */
-    public function update(Request $request, Author $author)
+    public function update(Request $request, Author $author): JsonResponse
     {
         $request->validate(
             [

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\RouteBindingSlugOrId;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ class Article extends Model
 {
     use HasFactory;
     use Sluggable;
+    use RouteBindingSlugOrId;
 
     protected $with = ['author', 'categories'];
 
@@ -21,11 +23,6 @@ class Article extends Model
         'author_id',
         'slug',
     ];
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
 
 
     public function changeCategories(array $categoryIds)

@@ -6,12 +6,14 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\RouteBindingSlugOrId;
 
 
 class Author extends Model
 {
     use HasFactory;
     use Sluggable;
+    use RouteBindingSlugOrId;
 
     protected $fillable = [
         'first_name',
@@ -22,11 +24,6 @@ class Author extends Model
         'biography',
         'slug',
     ];
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
 
     /**
      * Получить статьи принадлежащие автору

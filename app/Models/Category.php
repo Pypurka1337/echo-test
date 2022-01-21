@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\RouteBindingSlugOrId;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,7 @@ class Category extends Model
     use HasFactory;
     use NodeTrait;
     use Sluggable;
+    use RouteBindingSlugOrId;
 
     // Решение конфликта Sluggable и NodeTrait
     protected $fillable = [
@@ -28,11 +30,6 @@ class Category extends Model
         (new SlugService())->slug($instance, true);
 
         return $instance;
-    }
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
     }
 
     /**

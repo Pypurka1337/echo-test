@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\RouteBindingSlugOrId;
+use App\Traits\Models\RouteBindingSlugOrId;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

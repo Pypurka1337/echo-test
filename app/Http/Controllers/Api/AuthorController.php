@@ -24,42 +24,16 @@ class AuthorController extends Controller
             'fields' => ['array'],
         ]);
 
-        $authors = Author::where('id', '>', 0);
+        $builder = Author::where('id', '>', 0);
 
-        $articles = $request->query('articles');
-        if ($articles) {
-            $authors = $authors->whereHas('articles', function ($query) use ($articles) {
-                $query->where($articles);
-            });
-        }
+        $builder = Author::whereArticles($request, $builder);
+        Author::doSorting($request, $builder);
+        Author::doFiltering($request, $builder);
+        Author::selectFields($request, $builder);
 
-        $sort = $request->query('sort');
-        if ($sort) {
-            foreach ($sort as $value) {
-                $is_asc = (substr($value, 0, 1) !== '-');
-                if ($is_asc) {
-                    $authors->orderBy($value);
-                } else {
-                    $value = substr($value, 1);
-                    $authors->orderByDesc($value);
-                }
-            }
-        }
+        $result = Author::makePaginate($request, $builder);
 
-        $filters = $request->query('filters');
-        if ($filters) {
-            $authors->where($filters);
-        }
 
-        $fields = $request->query('fields');
-        if ($fields) {
-            $fields[] = 'id';
-            $fields = in_array('id', $fields) ? $fields : $fields[] = 'id';
-            $authors->select($fields);
-        }
-
-        $size = $request->query('size', 10);
-        $result = $authors->paginate($size)->withQueryString();
         foreach ($result->items() as $author) {
             $author->detail_page_url = $request->url() . '/' . $author->slug;
         }

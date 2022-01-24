@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\Models\HasFieldsSelecting;
+use App\Traits\Models\HasFiltering;
+use App\Traits\Models\HasPagination;
+use App\Traits\Models\HasSorting;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Traits\RouteBindingSlugOrId;
+use App\Traits\Models\RouteBindingSlugOrId;
+use Illuminate\Http\Request;
 
 
 class Author extends Model
@@ -14,6 +20,10 @@ class Author extends Model
     use HasFactory;
     use Sluggable;
     use RouteBindingSlugOrId;
+    use HasSorting;
+    use HasFiltering;
+    use HasFieldsSelecting;
+    use HasPagination;
 
     protected $fillable = [
         'first_name',
@@ -24,6 +34,17 @@ class Author extends Model
         'biography',
         'slug',
     ];
+
+    public static function whereArticles(Request $request, Builder $builder)
+    {
+        $articles = $request->query('articles');
+        if ($articles) {
+            return $builder->whereHas('articles', function ($query) use ($articles) {
+                $query->where($articles);
+            });
+        }
+        return $builder;
+    }
 
     /**
      * Получить статьи принадлежащие автору

@@ -25,49 +25,16 @@ class ArticleController extends Controller
             'fields' => ['array'],
         ]);
 
-        $articles = Article::where('id', '>', 0);
+        $builder = Article::where('id', '>', 0);
 
-        $author = $request->query('author');
-        if ($author) {
-            $articles = $articles->whereHas('author', function ($query) use ($author) {
-                $query->where($author);
-            });
-        }
+        $builder = Article::whereAuthor($request, $builder);
+        $builder = Article::whereCategories($request, $builder);
+        Article::doSorting($request, $builder);
+        Article::doFiltering($request, $builder);
+        Article::selectFields($request, $builder);
 
-        $categories = $request->query('categories');
-        if ($categories) {
-            $articles = $articles->whereHas('categories', function ($query) use ($categories) {
-                $query->where($categories);
-            });
-        }
+        $result = Article::makePaginate($request, $builder);
 
-        $sort = $request->query('sort');
-        if ($sort) {
-            foreach ($sort as $value) {
-                $is_asc = (substr($value, 0, 1) !== '-');
-                if ($is_asc) {
-                    $articles->orderBy($value);
-                } else {
-                    $value = substr($value, 1);
-                    $articles->orderByDesc($value);
-                }
-            }
-        }
-
-        $filters = $request->query('filters');
-        if ($filters) {
-            $articles->where($filters);
-        }
-
-        $fields = $request->query('fields');
-        if ($fields) {
-            $fields[] = 'id';
-            $fields = in_array('id', $fields) ? $fields : $fields[] = 'id';
-            $articles->select($fields);
-        }
-
-        $size = $request->query('size', 10);
-        $result = $articles->paginate($size)->withQueryString();
         foreach ($result->items() as $article) {
             $article->detail_page_url = $request->url() . '/' . $article->id;
         }
